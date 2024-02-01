@@ -1,6 +1,6 @@
 # LICENCE D'UTILISATION DU CODE ET DES SCHÉMAS
 
-Nom du Projet: Projet-Laser-Game
+Nom du Projet: Laser-Game
 
 Propriétaire: GUY Melvyn
 
