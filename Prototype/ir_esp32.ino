@@ -1,0 +1,32 @@
+#include <Arduino.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
+#include <IRrecv.h>
+#include <IRutils.h>
+
+#define IR_PIN 4
+int RECV_PIN = 2;
+
+IRsend irsend(IR_PIN);  // Set the GPIO to be used to sending the message.
+IRrecv irrecv(RECV_PIN);
+
+decode_results results;
+
+void setup() {
+  irsend.begin();
+  Serial.begin(115200);
+  Serial.println("Enabling IRin");
+  irrecv.enableIRIn(); // Start the receiver
+  Serial.println("Enabled IRin");
+}
+
+void loop() {
+  if (irrecv.decode(&results)) {
+    Serial.println(results.value, HEX);
+    irrecv.resume(); // Receive the next value
+  }
+  delay(100);
+  Serial.println("NEC");
+  irsend.sendNEC(0x00FFE01FUL);
+  delay(1000);
+}
