@@ -9,6 +9,7 @@ int RECV_PIN = 2;
 int ledPin = 12;
 const int buttonPin = 32;
 int buttonState = 0;
+int lastButtonState = HIGH;  // Ajout d'une variable pour suivre l'état précédent du bouton
 
 IRsend irsend(IR_PIN);  // Set the GPIO to be used to sending the message.
 IRrecv irrecv(RECV_PIN);
@@ -26,8 +27,6 @@ void setup() {
 }
 
 void loop() {
-  buttonState = digitalRead(buttonPin);
-  
   if (irrecv.decode(&results)) {
     Serial.println(results.value, HEX);
     irrecv.resume(); // Receive the next value
@@ -35,8 +34,11 @@ void loop() {
   }
   delay(100);
   digitalWrite(ledPin, LOW);
-  if (buttonState == LOW) {
-          irsend.sendNEC(0xFFA857, 32);
-  delay(1000);
-    }
+
+  buttonState = digitalRead(buttonPin);  // Read the button state here
+  if (buttonState == LOW && lastButtonState == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+    irsend.sendNEC(0x700000, 32);
+    delay(500);  // Reduced delay
+  }
+  lastButtonState = buttonState;  // Mettez à jour l'état précédent du bouton
 }
