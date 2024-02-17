@@ -1,0 +1,95 @@
+#include <Arduino.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
+#include <IRrecv.h>
+#include <IRutils.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include "RGBLed.h"
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define IR_PIN 4
+int RECV_PIN = 2;
+int ledPin = 12;
+const int buttonPin = 32;
+int buttonState = 0;
+RGBLed led(19, 18, 17);
+
+int lastButtonState = HIGH;  // Ajout d'une variable pour suivre l'état précédent du bouton
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+int vie = 100;
+
+IRsend irsend(IR_PIN);  // Set the GPIO to be used to sending the message.
+IRrecv irrecv(RECV_PIN);
+
+decode_results results;
+
+void setup() {
+  irsend.begin();
+  irsend.enableIROut(38);  // Set the frequency to 38 kHz
+  Serial.begin(9600);
+  Serial.println("Enabling IRin");
+  irrecv.enableIRIn(); // Start the receiver
+  Serial.println("Enabled IRin");
+  pinMode(ledPin, OUTPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+
+  // Ecran
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
+  //delay(2000);
+  display.clearDisplay();
+
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(15, 0);
+  // Display static text
+  display.println("David 20");
+
+  display.setTextSize(1);
+  display.setCursor(5, 20);
+  display.println("Nombre de vie :");
+  display.display(); 
+
+  //led.setColor(0, 27, 27);
+}
+
+void loop() {
+  if (irrecv.decode(&results)) {
+    Serial.println(results.value, HEX);
+    irrecv.resume(); // Receive the next value
+    digitalWrite(ledPin, HIGH);
+    //led.setColor(13, 0, 0);
+    vie = vie - 1;
+  }
+  //delay(100);
+  digitalWrite(ledPin, LOW);
+
+  buttonState = digitalRead(buttonPin);  // Read the button state here
+  if (buttonState == LOW && lastButtonState == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+    irsend.sendNEC(0x700000, 32);
+    led.setColor(13, 0, 0);
+    delay(500);  // Reduced delay
+    led.setColor(0, 0, 0);
+  }
+  lastButtonState = buttonState;  // Mettez à jour l'état précédent du bouton
+
+  //Ecran
+  display.clearDisplay();
+
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(15, 0);
+  // Display static text
+  display.println("David 20");
+
+  display.setTextSize(1);
+  display.setCursor(5, 25);
+  display.println("Nombre de vie : " + String(vie));
+  display.display(); 
+  
+}

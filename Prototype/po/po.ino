@@ -18,6 +18,7 @@ decode_results results;
 
 void setup() {
   irsend.begin();
+  irsend.enableIROut(38);  // Set the frequency to 38 kHz
   Serial.begin(9600);
   Serial.println("Enabling IRin");
   irrecv.enableIRIn(); // Start the receiver
@@ -37,7 +38,7 @@ void loop() {
 
   buttonState = digitalRead(buttonPin);  // Read the button state here
   if (buttonState == LOW && lastButtonState == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
-    irsend.sendNEC(0x700000, 32);
+    irsend.sendNEC(0x000000, 32);
     delay(500);  // Reduced delay
   }
   lastButtonState = buttonState;  // Mettez à jour l'état précédent du bouton
