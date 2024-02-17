@@ -31,8 +31,9 @@ int lastButtonState3 = HIGH;  // Ajout d'une variable pour suivre l'état préc�
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 
-int vie = 10;
+int vie = 5;
 int balle = 10;
+int fin = 5;
 
 IRsend irsend(IR_PIN);  // Set the GPIO to be used to sending the message.
 IRrecv irrecv(RECV_PIN);
@@ -77,96 +78,158 @@ void setup() {
 }
 
 void loop() {
-  if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
-    irrecv.resume(); // Receive the next value
-    digitalWrite(ledPin, HIGH);
-    //led.setColor(13, 0, 0);
-    if (results.value == 0x700000)
-    {
-      vie = vie + 1;
-    }
-    if (results.value == 0x700100)
-    {
-      vie = vie - 1;
-    }
-    
-  }
-  //delay(100);
-  digitalWrite(ledPin, LOW);
-  if (balle >0)
+  if (vie >0)
   {
-    buttonState1 = digitalRead(buttonPin1);  // Read the button state here
-    if (buttonState1 == LOW && lastButtonState1 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
-      irsend.sendNEC(0x700000, 32);
-      balle = balle - 1;
-      led2.setColor(0, 13, 0);
-      delay(500);  // Reduced delay
-      led2.setColor(0, 0, 0);
+    if (irrecv.decode(&results)) {
+      Serial.println(results.value, HEX);
+      irrecv.resume(); // Receive the next value
+      digitalWrite(ledPin, HIGH);
+      //led.setColor(13, 0, 0);
+      if (results.value == 0x700000)
+      {
+        //results.value = 0x000000;
+        vie = vie + 1;
+      }
+      if (results.value == 0x700100)
+      {
+        //results.value = 0x000000;
+        vie = vie - 1;
+        if (vie >0)
+        { 
+          //Ecran
+          display.clearDisplay();
+        
+          display.setTextSize(2);
+          display.setTextColor(WHITE);
+          display.setCursor(15, 0);
+          // Display static text
+          display.println("David 20");
+        
+          display.setTextSize(1);
+          display.setCursor(5, 25);
+          display.println("Vies : " + String(vie));
+          display.setCursor(5, 50);
+          display.println("Balles : " + String(balle));
+          display.display();
+        
+          for (int i = 0; i<3; i++)
+          {
+            led1.setColor(13, 13, 13);
+            led2.setColor(13, 13, 13);
+            delay(500);  // Reduced delay
+            led1.setColor(0, 0, 0);
+            led2.setColor(0, 0, 0);
+            delay(500);  // Reduced delay
+          }
+          delay(7000);  // Reduced delay
+          led1.setColor(0, 27, 27);
+        }
+      }
+      
     }
-    lastButtonState1 = buttonState1;  // Mettez à jour l'état précédent du bouton
-  
-    buttonState2 = digitalRead(buttonPin2);  // Read the button state here
-    if (buttonState2 == LOW && lastButtonState2 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
-      irsend.sendNEC(0x700100, 32);
-      balle = balle - 1;
-      led2.setColor(13, 0, 0);
-      delay(500);  // Reduced delay
-      led2.setColor(0, 0, 0);
-    }
-    lastButtonState2 = buttonState2;  // Mettez à jour l'état précédent du bouton
-
-    //Ecran
-    display.clearDisplay();
-  
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
-    display.setCursor(15, 0);
-    // Display static text
-    display.println("David 20");
-  
-    display.setTextSize(1);
-    display.setCursor(5, 25);
-    display.println("Vies : " + String(vie));
-    display.setCursor(5, 50);
-    display.println("Balles : " + String(balle));
-    display.display(); 
+    //delay(100);
+    digitalWrite(ledPin, LOW);
+    if (balle >0)
+    {
+      buttonState1 = digitalRead(buttonPin1);  // Read the button state here
+      if (buttonState1 == LOW && lastButtonState1 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+        irsend.sendNEC(0x700000, 32);
+        balle = balle - 1;
+        led2.setColor(0, 13, 0);
+        delay(500);  // Reduced delay
+        led2.setColor(0, 0, 0);
+      }
+      lastButtonState1 = buttonState1;  // Mettez à jour l'état précédent du bouton
     
+      buttonState2 = digitalRead(buttonPin2);  // Read the button state here
+      if (buttonState2 == LOW && lastButtonState2 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+        irsend.sendNEC(0x700100, 32);
+        balle = balle - 1;
+        led2.setColor(13, 0, 0);
+        delay(500);  // Reduced delay
+        led2.setColor(0, 0, 0);
+      }
+      lastButtonState2 = buttonState2;  // Mettez à jour l'état précédent du bouton
+  
+      //Ecran
+      display.clearDisplay();
+    
+      display.setTextSize(2);
+      display.setTextColor(WHITE);
+      display.setCursor(15, 0);
+      // Display static text
+      display.println("David 20");
+    
+      display.setTextSize(1);
+      display.setCursor(5, 25);
+      display.println("Vies : " + String(vie));
+      display.setCursor(5, 50);
+      display.println("Balles : " + String(balle));
+      display.display(); 
+      
+    }
+    else
+    {
+         //Ecran
+      display.clearDisplay();
+    
+      display.setTextSize(2);
+      display.setTextColor(WHITE);
+      display.setCursor(15, 0);
+      // Display static text
+      display.println("David 20");
+    
+      display.setTextSize(1);
+      display.setCursor(5, 25);
+      display.println("Vies : " + String(vie));
+      display.setCursor(10, 40);
+      display.setTextSize(2);
+      display.println("Rechargez");
+      display.display(); 
+  
+      
+      /*led2.setColor(13, 13, 0);
+      delay(50);  // Reduced delay
+      led2.setColor(0, 0, 0);
+      delay(50);  // Reduced delay*/
+         
+    }
+      buttonState3 = digitalRead(buttonPin3);  // Read the button state here
+    if (buttonState3 == LOW && lastButtonState3 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+      //irsend.sendNEC(0x700200, 32);
+      balle = 10;
+      led2.setColor(0, 0, 13);
+      delay(500);  // Reduced delay
+      led2.setColor(0, 0, 0);
+    }
+    lastButtonState3 = buttonState3;  // Mettez à jour l'état précédent du bouton
+
   }
   else
   {
-       //Ecran
-    display.clearDisplay();
-  
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
-    display.setCursor(15, 0);
-    // Display static text
-    display.println("David 20");
-  
-    display.setTextSize(1);
-    display.setCursor(5, 25);
-    display.println("Vies : " + String(vie));
-    display.setCursor(10, 40);
-    display.setTextSize(2);
-    display.println("Rechargez");
-    display.display(); 
-
+    //Ecran
+      display.clearDisplay();
     
-    /*led2.setColor(13, 13, 0);
-    delay(50);  // Reduced delay
-    led2.setColor(0, 0, 0);
-    delay(50);  // Reduced delay*/
-       
+      display.setTextSize(2);
+      //display.setTextColor(WHITE);
+      display.setCursor(15, 0);
+      // Display static text
+      display.println("David 20");
+
+      display.setCursor(5, 30);
+      display.setTextSize(2);
+      display.println("FIN DU JEU");
+      display.display(); 
+
+      if(fin>0)
+      {
+        led1.setColor(13, 13, 13);
+        led2.setColor(13, 13, 13);
+        delay(500);  // Reduced delay
+        led1.setColor(0, 0, 0);
+        led2.setColor(0, 0, 0);
+        delay(500);  // Reduced delay
+        fin --;
+      }
   }
-    buttonState3 = digitalRead(buttonPin3);  // Read the button state here
-  if (buttonState3 == LOW && lastButtonState3 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
-    //irsend.sendNEC(0x700200, 32);
-    balle = 10;
-    led2.setColor(0, 0, 13);
-    delay(500);  // Reduced delay
-    led2.setColor(0, 0, 0);
-  }
-  lastButtonState3 = buttonState3;  // Mettez à jour l'état précédent du bouton
-  
 }
