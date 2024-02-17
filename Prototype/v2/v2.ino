@@ -13,11 +13,22 @@
 #define IR_PIN 4
 int RECV_PIN = 2;
 int ledPin = 12;
-const int buttonPin = 32;
-int buttonState = 0;
-RGBLed led(19, 18, 17);
+const int buttonPin1 = 27;
+const int buttonPin2 = 32;
+const int buttonPin3 = 33;
 
-int lastButtonState = HIGH;  // Ajout d'une variable pour suivre l'état précédent du bouton
+RGBLed led1(14, 13, 12);
+RGBLed led2(19, 18, 17);
+
+int buttonState1 = 0;
+int lastButtonState1 = HIGH;  // Ajout d'une variable pour suivre l'état précédent du bouton
+
+int buttonState2 = 0;
+int lastButtonState2 = HIGH;  // Ajout d'une variable pour suivre l'état précédent du bouton
+
+int buttonState3 = 0;
+int lastButtonState3 = HIGH;  // Ajout d'une variable pour suivre l'état précédent du bouton
+
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 int vie = 100;
 
@@ -34,7 +45,9 @@ void setup() {
   irrecv.enableIRIn(); // Start the receiver
   Serial.println("Enabled IRin");
   pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode(buttonPin2, INPUT_PULLUP);
+  pinMode(buttonPin3, INPUT_PULLUP);
 
   // Ecran
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
@@ -55,7 +68,7 @@ void setup() {
   display.println("Nombre de vie :");
   display.display(); 
 
-  //led.setColor(0, 27, 27);
+  led1.setColor(0, 27, 27);
 }
 
 void loop() {
@@ -69,14 +82,32 @@ void loop() {
   //delay(100);
   digitalWrite(ledPin, LOW);
 
-  buttonState = digitalRead(buttonPin);  // Read the button state here
-  if (buttonState == LOW && lastButtonState == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+  buttonState1 = digitalRead(buttonPin1);  // Read the button state here
+  if (buttonState1 == LOW && lastButtonState1 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
     irsend.sendNEC(0x700000, 32);
-    led.setColor(13, 0, 0);
+    led2.setColor(0, 13, 0);
     delay(500);  // Reduced delay
-    led.setColor(0, 0, 0);
+    led2.setColor(0, 0, 0);
   }
-  lastButtonState = buttonState;  // Mettez à jour l'état précédent du bouton
+  lastButtonState1 = buttonState1;  // Mettez à jour l'état précédent du bouton
+
+  buttonState2 = digitalRead(buttonPin2);  // Read the button state here
+  if (buttonState2 == LOW && lastButtonState2 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+    irsend.sendNEC(0x700100, 32);
+    led2.setColor(13, 0, 0);
+    delay(500);  // Reduced delay
+    led2.setColor(0, 0, 0);
+  }
+  lastButtonState2 = buttonState2;  // Mettez à jour l'état précédent du bouton
+
+    buttonState3 = digitalRead(buttonPin3);  // Read the button state here
+  if (buttonState3 == LOW && lastButtonState3 == HIGH) {  // Vérifiez si l'état du bouton est passé de HIGH à LOW
+    irsend.sendNEC(0x700200, 32);
+    led2.setColor(0, 0, 13);
+    delay(500);  // Reduced delay
+    led2.setColor(0, 0, 0);
+  }
+  lastButtonState3 = buttonState3;  // Mettez à jour l'état précédent du bouton
 
   //Ecran
   display.clearDisplay();
